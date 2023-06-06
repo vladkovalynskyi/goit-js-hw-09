@@ -16,15 +16,13 @@ const datePicker = flatpickr('#datetime-picker', {
     time_24hr: true,
     defaultDate: new Date(),
     minuteIncrement: 1,
-    onClose(selectedDates) {
-        const selectedDate = selectedDates[0];
-        
-        if (selectedDate > new Date()) {
+    onClose([selectedDate]) {
+        if (selectedDate > Date.now()) {
             startBtn.disabled = false;
         } else {
             alert('Please choose a date in the future');
         }
-  },
+    },
 });
 
 startBtn.addEventListener('click', () => {
@@ -38,27 +36,30 @@ startBtn.addEventListener('click', () => {
     startBtn.disabled = true;
 
     const countdown = () => {
-        const currentTime = new Date().getTime();
+        const currentTime = Date.now();
         const distance = selectedDate.getTime() - currentTime;
 
         if (distance < 0) {
           clearInterval(countdownInterval);
           showAlert("Timer has ended");
-          startBtn.disabled = false;
           return;
         }
 
         const { days, hours, minutes, seconds } = convertMs(distance);
 
-        daysEl.textContent = addLeadingZero(days);
-        hoursEl.textContent = addLeadingZero(hours);
-        minutesEl.textContent = addLeadingZero(minutes);
-        secondsEl.textContent = addLeadingZero(seconds);
+        setElementText(daysEl, days);
+        setElementText(hoursEl, hours);
+        setElementText(minutesEl, minutes);
+        setElementText(secondsEl, seconds);
     };
 
     countdown();
     countdownInterval = setInterval(countdown, 1000);
 });
+
+function setElementText(element, value) {
+    element.textContent = addLeadingZero(value);
+}
 
 function convertMs(ms) {
   const second = 1000;
